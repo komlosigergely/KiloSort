@@ -6,6 +6,7 @@ Nfilt   = ops.Nfilt;
 lam =  ones(Nfilt, 1, 'single');
 lam(:)    = ops.lam(3);
 
+%
 [W, U, mu, UtU, nu] = decompose_dWU(ops, rez.dWU, ops.Nrank,rez.ops.kcoords);
 
 

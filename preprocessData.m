@@ -137,6 +137,8 @@ while 1
     else
         dataRAW = buff;
     end
+    
+    % Creates filtered signal /kg
     dataRAW = dataRAW';
     dataRAW = single(dataRAW);
     dataRAW = dataRAW(:, chanMapConn);
@@ -172,7 +174,7 @@ end
 fclose(fid);
 fprintf('Time %3.0fs. Channel-whitening filters computed. \n', toc);
 switch ops.whitening
-    case 'diag'
+    case 'diag'             % when 'diag' comes from? it is not listed as an input option on config file. Also what happens for full??
         CC = diag(diag(CC));
     case 'noSpikes'
         CC = CC ./nPairs;
@@ -229,6 +231,9 @@ for ibatch = 1:Nbatch
             buff(:, nsampcurr+1:NTbuff) = repmat(buff(:,nsampcurr), 1, NTbuff-nsampcurr);
         end
         
+        % this block is found in KS-2/preprocessDataSub/gpufilter.
+        % there, there is median substraction whithin channel and common
+        % average referencing by median across channel before filtering. /kg
         if ops.GPU
             dataRAW = gpuArray(buff);
         else
@@ -243,11 +248,12 @@ for ibatch = 1:Nbatch
         datr = filter(b1, a1, datr);
         datr = flipud(datr);
         
-        datr = datr(ioffset + (1:NT),:);
+        datr = datr(ioffset + (1:NT),:); % remove timepoints used as buffers
     end
     
-    datr    = datr * Wrot;
+    datr    = datr * Wrot; % whiten the data and scale by 200 for int16 range
     
+    %>> this block is something missing from KS-2
     if ops.GPU
         dataRAW = gpuArray(datr);
     else
@@ -274,6 +280,8 @@ for ibatch = 1:Nbatch
         uproj(i0 + (1:numel(row)), :) = gather_try(uS);
         i0 = i0 + numel(row);
     end
+    % << block end
+    
     
     if ibatch<=Nbatch_buff
         DATA(:,:,ibatch) = gather_try(datr);

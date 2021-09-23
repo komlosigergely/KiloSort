@@ -230,7 +230,7 @@ while (i<=Nbatch * ops.nfullpasses+1)
     end
     
     % update status
-    if ops.verbose  && rem(i,20)==1
+    if 0% ops.verbose  && rem(i,20)==1          % kg
         nsort = sort(round(sum(nspikes,2)), 'descend');
         fprintf(repmat('\b', 1, numel(msg)));
         msg = sprintf('Time %2.2f, batch %d/%d, mu %2.2f, neg-err %2.6f, NTOT %d, n100 %d, n200 %d, n300 %d, n400 %d\n', ...
