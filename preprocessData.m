@@ -77,12 +77,17 @@ else
     memallocated = ops.ForceMaxRAMforDat;
 end
 nint16s      = memallocated/2;
-
 NTbuff      = NT + 4*ops.ntbuff;
-Nbatch      = ceil(d.bytes/2/NchanTOT /(NT-ops.ntbuff));
-Nbatch_buff = floor(4/5 * nint16s/rez.ops.Nchan /(NT-ops.ntbuff)); % factor of 4/5 for storing PCs of spikes
-Nbatch_buff = min(Nbatch_buff, Nbatch);
 
+if isfield(ops, 'temp')
+     Nbatch = ops.temp.Nbatch;
+     Nbatch_buff = ops.temp.Nbatch_buff;
+else
+
+    Nbatch      = ceil(d.bytes/2/NchanTOT /(NT-ops.ntbuff));
+    Nbatch_buff = floor(4/5 * nint16s/rez.ops.Nchan /(NT-ops.ntbuff)); % factor of 4/5 for storing PCs of spikes
+    Nbatch_buff = min(Nbatch_buff, Nbatch);
+end
 %% load data into patches, filter, compute covariance
 if isfield(ops,'fslow')&&ops.fslow<ops.fs/2
     [b1, a1] = butter(3, [ops.fshigh/ops.fs,ops.fslow/ops.fs]*2, 'bandpass');
